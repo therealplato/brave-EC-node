@@ -1,0 +1,35 @@
+{
+  "name": "brave-EC",
+  "version": "0.0.1",
+  "description": "Elliptic Curve utilities for the Brave Collective Core Services nodejs bindings",
+  "main": "index.js",
+  "dependencies": {
+    "node-forge": "~0.2.22"
+  },
+  "devDependencies": {
+    "mocha": "*"
+  },
+  "scripts": {
+    "test": "cd test; mocha -R spec test.js readme.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/therealplato/brave-EC-node"
+  },
+  "keywords": [
+    "ecdsa",
+    "elliptic",
+    "asn1",
+    "der",
+    "pem",
+    "openssl",
+    "authentication",
+    "bccs"
+  ],
+  "author": "therealplato",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/therealplato/brave-EC-node/issues"
+  },
+  "homepage": "https://github.com/therealplato/brave-EC-node"
+}
