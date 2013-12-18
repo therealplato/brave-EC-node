@@ -1,3 +1,4 @@
+// brave-ec index.js
 var fs = require('fs');
 var forge = require('node-forge');
 var asn1 = forge.asn1;

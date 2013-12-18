@@ -12,14 +12,14 @@ Validation and DER decoding are handled with
 ##Usage
 
 ```
-// $ npm install brave-EC; cd node_modules/brave-EC
+// $ npm install brave-ec; cd node_modules/brave-ec
 // $ npm test
 
-var d = new Date()l
+var d = new Date();
 var datestr = [d.getFullYear(), d.getMonth(), d.getDay()].join('-');
 var filename = 'braveApp-'+datestr+'.pem';
 
-var braveEC = require('brave-EC');
+var braveEC = require('brave-ec');
 
 // Generate a keypair and write it to disk for future signatures:
 braveEC.newECKeypair(function(err, keys){
