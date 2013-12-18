@@ -11,7 +11,7 @@ Validation and DER decoding are handled with
 
 ##Usage
 
-```
+```javascript
 // $ npm install brave-ec; cd node_modules/brave-ec
 // $ npm test
 

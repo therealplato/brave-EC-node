@@ -12,6 +12,7 @@ var FAKE_PEM =
 var REAL_PEM = "";
 
 describe('openssl version', function(){
+  var opensslV = "";
   it('should match /\d+\.\d+\.\d+/', function(done){
 
     require('child_process').exec('openssl version',
@@ -24,10 +25,16 @@ describe('openssl version', function(){
       assert.equal(error, null, 'exec error: ' + error);
       var vFound = /(\d+)\.(\d+)\.(\d+)/.exec(stdout);
       //console.log(stdout);
-
       assert.notEqual(vFound, null, "version string not found in stdout:"+stdout)
+      if(vFound){ opensslV = vFound[0]; };
       done(null);
     });
+  });
+
+  it('should be greater than 0.9.8', function(){
+    assert.notEqual("", opensslV);
+    var good = require('semver').satisfies(opensslV, '>=0.9.8');
+    assert.equal(good, true);
   });
 });
 describe('openssl ecparam -list_curves', function(){

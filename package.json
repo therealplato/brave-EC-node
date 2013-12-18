@@ -4,6 +4,7 @@
   "description": "Elliptic Curve utilities for the Brave Collective Core Services nodejs bindings",
   "main": "index.js",
   "dependencies": {
+    "semver": "~2.2.1",
     "node-forge": "~0.2.22"
   },
   "devDependencies": {
