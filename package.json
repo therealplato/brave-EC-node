@@ -11,7 +11,7 @@
     "mocha": "*"
   },
   "scripts": {
-    "test": "cd test; mocha -R spec test.js readme.js"
+    "test": "cd test; mocha -R spec test.js"
   },
   "repository": {
     "type": "git",

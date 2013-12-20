@@ -66,7 +66,7 @@ var braveEC = require('../index.js');
 describe('braveEC', function(){
   it('should instantiate', function(){
     assert.notEqual(braveEC, undefined);
-    assert.notEqual(braveEC.newECKeypair, undefined);
+    assert.notEqual(braveEC.newKeypair, undefined);
   });
 
   describe('._normalizeInput', function(){
@@ -111,21 +111,21 @@ describe('braveEC', function(){
     });
   });
   
-  describe('._ecASNfromDER', function(){
+  describe('.ASNfromDERPriv', function(){
     it('should parse a DER Buffer into ASN object'
     ,function(){
       assert.doesNotThrow(function(){
         // make a DER buffer:
         var base64 = braveEC._stripPemArmor(REAL_PEM);
         var derBuffer = new Buffer(base64, 'base64');
-        var asnResults = braveEC._ecASNfromDER(derBuffer);
+        var asnResults = braveEC.ASNfromDERPriv(derBuffer);
         assert.equal(true, !!asnResults, 'asnResults missing');
         assert.notEqual(undefined, asnResults.privKey, 'privKey missing');
       });
     });
     it('should parse a PEM-armored string into ASN object', function(){
       assert.doesNotThrow(function(){
-        var asnResults = braveEC._ecASNfromDER(REAL_PEM);
+        var asnResults = braveEC.ASNfromDERPriv(REAL_PEM);
         assert.equal(true, !!asnResults, 'asnResults missing');
         assert.notEqual(undefined, asnResults.privKey, 'privKey missing');
       });
@@ -135,10 +135,23 @@ describe('braveEC', function(){
         var base64 = braveEC._stripPemArmor(REAL_PEM);
         var derBuffer = new Buffer(base64, 'base64');
         var hexStr = derBuffer.toString('hex')
-        var asnResults = braveEC._ecASNfromDER(hexStr);
+        var asnResults = braveEC.ASNfromDERPriv(hexStr);
         assert.equal(true, !!asnResults, 'asnResults missing');
         assert.notEqual(undefined, asnResults.privKey, 'privKey missing');
       });
+    });
+  });
+
+  describe('.ASNfromDERPub', function(){
+    it('should load a PEM EC pubkey from file and validate it'
+    , function(){
+      var pubkey = fs.readFileSync('./fixtures/prime256v1-pubkey.pem', {encoding:'utf8'});
+      assert.doesNotThrow(function(){
+        var asnResults = braveEC.ASNfromDERPub(pubkey);
+        assert.equal(true, !!asnResults, 'asnResults missing');
+        assert.notEqual(undefined, asnResults.pubKey, 'pubKey missing');
+      });
+
     });
   });
 
@@ -153,10 +166,10 @@ describe('braveEC', function(){
     });
   });
   
-  describe('.newECKeypair', function(){
+  describe('.newKeypair', function(){
     it('should create public and private keys in PEM and hex'
     ,function(done){
-      braveEC.newECKeypair(function(err, output){
+      braveEC.newKeypair(function(err, output){
         assert.equal(null, err);
         assert.notEqual(null, output.priv.hex.match(/^[0-9a-f]+$/));
         assert.notEqual(null, output.pub.hex.match(/^[0-9a-f]+$/));
@@ -167,7 +180,7 @@ describe('braveEC', function(){
     });
   });
 
-  describe('.loadECPemFromStdin', function(){
+  describe('.loadPemPrivFromStdin', function(){
     it('should load a PEM from stdin and output hex keys to stdout'
     ,function(done){
       var output = "";
@@ -177,7 +190,7 @@ describe('braveEC', function(){
         process.stdin.emit('data', REAL_PEM);
         process.stdin.end();
       }, 700);
-      braveEC.loadECPemFromStdin(function(err, output){
+      braveEC.loadPemPrivFromStdin(function(err, output){
         assert.equal(null, err);
         //console.log(output);
         assert.notEqual(output.pub.hex.match(/^[a-f0-9]+$/));
@@ -186,10 +199,10 @@ describe('braveEC', function(){
     });
   });
 
-  describe('.loadECPemFromFile', function(){
+  describe('.loadPemPrivFromFile', function(){
     it('should load a PEM from stdin and output hex keys'
     ,function(done){
-      braveEC.loadECPemFromFile('./fixtures/prime256v1-keypair.pem'
+      braveEC.loadPemPrivFromFile('./fixtures/prime256v1-keypair.pem'
       , function(err, output){
         assert.equal(null, err);
         assert.notEqual(output.pub.hex.match(/^[a-f0-9]+$/));
@@ -197,4 +210,5 @@ describe('braveEC', function(){
       });
     });
   });
+
 });
