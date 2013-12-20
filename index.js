@@ -1,5 +1,6 @@
 // brave-ec index.js
 var fs = require('fs');
+var path = require('path');
 var forge = require('node-forge');
 var asn1 = forge.asn1;
 var prime256v1_privkey_validator = require('./prime256v1_privkey_validator.js');
@@ -12,6 +13,7 @@ module.exports = (function(){
   var braveEC = {};
 
   braveEC.loadPemPrivFromFile = function(filename, callback){
+    filename = path.normalize(process.cwd()+'/'+filename); 
     fs.readFile(filename, 'utf8', function(err, pem){
       if(err){ return callback(err) };
       braveEC._pemPrivToOutput(pem, function(err, output){
@@ -22,8 +24,11 @@ module.exports = (function(){
   };
 
   braveEC.loadPemPubFromFile = function(filename, callback){
+    filename = path.normalize(process.cwd()+'/'+filename); 
     fs.readFile(filename, 'utf8', function(err, pem){
-      if(err){ return callback(err) };
+      if(err){ 
+        return callback(err) 
+      };
       braveEC._pemPubToOutput(pem, function(err, output){
         if(err){ return callback(err) };
         callback(null, output);
@@ -97,10 +102,11 @@ module.exports = (function(){
       // Validate and parse the DER structure encoded in the PEM data
       // This is necessary to get the key values out to hex encode them
       var keyBuffer = braveEC.ASNfromDERPub(pemPub);
-      output.pub.hex = keyBuffers.pubKey.toString('hex');
+      output.pub.hex = keyBuffer.pubKey.toString('hex');
     } catch(e){
       return callback(e);
     }
+    return callback(null, output);
   };
 
   // Expected input is a DER-encoded EC key, either in a Node Buffer, hex

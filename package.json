@@ -1,6 +1,6 @@
 {
   "name": "brave-ec",
-  "version": "0.0.2",
+  "version": "0.0.4",
   "description": "Elliptic Curve utilities for the Brave Collective Core Services nodejs bindings",
   "main": "index.js",
   "dependencies": {
