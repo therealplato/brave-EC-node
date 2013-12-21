@@ -22,7 +22,7 @@ var filename = 'braveApp-'+datestr+'.pem';
 var braveEC = require('brave-ec');
 
 // Generate a keypair and write it to disk for future signatures:
-braveEC.newECKeypair(function(err, keys){
+braveEC.newKeypair(function(err, keys){
   if(err){ throw err };
   if(fs.existsSync(filename)){ throw 'Not overwriting existing key' };
   fs.writeFileSync(filename, keys.priv.pem
@@ -33,13 +33,13 @@ braveEC.newECKeypair(function(err, keys){
 });
 
 // Load an existing keypair from disk:
-braveEC.loadECPemFromFile(filename, function(err, keys){
+braveEC.loadPemPrivFromFile(filename, function(err, keys){
   if(err){ throw err };
   console.log('Successfully loaded these keys from '+filename;);
   console.log(keys);
 });
 
-/* This `keys` object returned by .newECKeypair and .loadECPemFromFile
+/* This `keys` object returned by .newKeypair and .loadPemFromFile
 will look like:
 { 
   priv: {
@@ -54,16 +54,17 @@ will look like:
 */                      
 
 // Extract the private and public keys from a DER-encoded ASN.1 object:
-var keys = braveEC._ecASNfromDER(input);
+var keys = braveEC.ASNFromDERPriv(input);
 
-// `input` may be Node Buffer, utf8 hex string, or utf8 PEM-armored EC PRIVATE
-// KEY string. 
+// `input` above may be Node Buffer, utf8 hex string, or utf8 PEM-armored 
+// EC PRIVATE KEY string. 
 // `keys` will have .privKey and .pubKey properties, these are nodejs binary
 // buffers suitable for .toString(encoding) or writing to file
 ```
 
 ##Todo
 Sign and verify
+Properly handle files larger than a single stdin/stdout buffer
 
 ##Done
 Decode DER to get actual keys

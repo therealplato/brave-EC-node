@@ -111,21 +111,21 @@ describe('braveEC', function(){
     });
   });
   
-  describe('.ASNfromDERPriv', function(){
+  describe('.ASNFromDERPriv', function(){
     it('should parse a DER Buffer into ASN object'
     ,function(){
       assert.doesNotThrow(function(){
         // make a DER buffer:
         var base64 = braveEC._stripPemArmor(REAL_PEM);
         var derBuffer = new Buffer(base64, 'base64');
-        var asnResults = braveEC.ASNfromDERPriv(derBuffer);
+        var asnResults = braveEC.ASNFromDERPriv(derBuffer);
         assert.equal(true, !!asnResults, 'asnResults missing');
         assert.notEqual(undefined, asnResults.privKey, 'privKey missing');
       });
     });
     it('should parse a PEM-armored string into ASN object', function(){
       assert.doesNotThrow(function(){
-        var asnResults = braveEC.ASNfromDERPriv(REAL_PEM);
+        var asnResults = braveEC.ASNFromDERPriv(REAL_PEM);
         assert.equal(true, !!asnResults, 'asnResults missing');
         assert.notEqual(undefined, asnResults.privKey, 'privKey missing');
       });
@@ -135,19 +135,19 @@ describe('braveEC', function(){
         var base64 = braveEC._stripPemArmor(REAL_PEM);
         var derBuffer = new Buffer(base64, 'base64');
         var hexStr = derBuffer.toString('hex')
-        var asnResults = braveEC.ASNfromDERPriv(hexStr);
+        var asnResults = braveEC.ASNFromDERPriv(hexStr);
         assert.equal(true, !!asnResults, 'asnResults missing');
         assert.notEqual(undefined, asnResults.privKey, 'privKey missing');
       });
     });
   });
 
-  describe('.ASNfromDERPub', function(){
+  describe('.ASNFromDERPub', function(){
     it('should load a PEM EC pubkey from file and validate it'
     , function(){
       var pubkey = fs.readFileSync('./fixtures/prime256v1-pubkey.pem', {encoding:'utf8'});
       assert.doesNotThrow(function(){
-        var asnResults = braveEC.ASNfromDERPub(pubkey);
+        var asnResults = braveEC.ASNFromDERPub(pubkey);
         assert.equal(true, !!asnResults, 'asnResults missing');
         assert.notEqual(undefined, asnResults.pubKey, 'pubKey missing');
       });

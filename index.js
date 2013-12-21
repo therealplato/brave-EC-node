@@ -53,6 +53,8 @@ module.exports = (function(){
     });
   };
 
+  braveEC.genKeypair = braveEC.newKeypair;
+
   braveEC._pemPrivToOutput = function(pemPriv, callback){
     // Note: The pem fields store a PEM armored, base64 encoded, DER data
     // structure that contains the public and/or private keys.
@@ -78,9 +80,11 @@ module.exports = (function(){
       try {
         // Validate and parse the DER structure encoded in the PEM data
         // This is necessary to get the key values out to hex encode them
-        var keyBuffers = braveEC.ASNfromDERPriv(pemPriv);
+        var keyBuffers = braveEC.ASNFromDERPriv(pemPriv);
         output.pub.hex = keyBuffers.pubKey.toString('hex');
+        console.log('Generated pubkey of hex length '+output.pub.hex.length);
         output.priv.hex = keyBuffers.privKey.toString('hex');
+        console.log('Generated privkey of hex length '+output.priv.hex.length);
       } catch(e){
         return callback(e);
       }
@@ -101,7 +105,7 @@ module.exports = (function(){
     try {
       // Validate and parse the DER structure encoded in the PEM data
       // This is necessary to get the key values out to hex encode them
-      var keyBuffer = braveEC.ASNfromDERPub(pemPub);
+      var keyBuffer = braveEC.ASNFromDERPub(pemPub);
       output.pub.hex = keyBuffer.pubKey.toString('hex');
     } catch(e){
       return callback(e);
@@ -112,7 +116,7 @@ module.exports = (function(){
   // Expected input is a DER-encoded EC key, either in a Node Buffer, hex
   // encoded utf8 string, or PEM-armored utf8 string.
   // Run it through forge to validate structure, throw or return ASN object
-  braveEC.ASNfromDERPriv = function(input){
+  braveEC.ASNFromDERPriv = function(input){
     // see ./prime256v1_privkey_validator.js
     var binBuffer = braveEC._normalizeInput(input);
     var forgeBuffer = forge.util.createBuffer(binBuffer.toString('binary'));
@@ -142,7 +146,7 @@ module.exports = (function(){
     };
   };
 
-  braveEC.ASNfromDERPub = function(input){
+  braveEC.ASNFromDERPub = function(input){
     // see ./prime256v1_pubkey_validator.js
     var binBuffer = braveEC._normalizeInput(input); // strips PEM etc
     var forgeBuffer = forge.util.createBuffer(binBuffer.toString('binary'));
@@ -170,7 +174,7 @@ module.exports = (function(){
   // Take PEM armored private EC key and generate PEM pubkey
   braveEC._genPubKey = function(input, callback){
     var openssl = require('child_process')
-    .spawn('openssl' ,['ec','-pubout']);
+    .spawn('openssl' ,['ec','-pubout', '-conv_form', 'compressed']);
 
     openssl.stdin.write(input, 'utf8', function(err){ 
       if(err){return callback(err)};
@@ -268,6 +272,27 @@ module.exports = (function(){
     });
   };
 
+  braveEC.cfg = function(cfg){
+    braveEC._config = cfg;
+  };
+
+  braveEC.sign = function(date, uri, body, callback){
+    if(!braveEC._config.clientPriv){ 
+      return callback('Set the client private key with .cfg before signing');
+    };
+    var keyName = path.normalize(braveEC._config.clientPriv);
+    console.log(keyName);
+    var payload = [date, uri, body].join('\n');
+    var sig = "";
+    var openssl = require('child_process').spawn('openssl'
+    ,['dgst', '-sign', keyName, '-sha256']);
+    openssl.stdout.setEncoding('hex');
+    openssl.stdout.on('data', function(data){ sig += data });
+    openssl.on('close', function(){ callback(null, sig) });
+    openssl.on('error', function(err){ callback(err) });
+    openssl.stdin.write(payload);
+    openssl.stdin.end();
+  };
 
   return braveEC;
 })();
