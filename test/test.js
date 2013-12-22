@@ -211,4 +211,15 @@ describe('braveEC', function(){
     });
   });
 
+  describe('loadPemPubFromFile', function(){
+    it('should not error', function(done){
+      braveEC.loadPemPubFromFile('./fixtures/clientPub132.pem', function(err, keys){
+        assert.equal(err, null);
+        console.log(keys);
+        console.log('Hex key length', keys.pub.hex.length);
+        done();
+      });
+    });
+  });
+
 });

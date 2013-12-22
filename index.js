@@ -74,6 +74,7 @@ module.exports = (function(){
     };
     output.priv.pem = pemPriv;
     // PEM encode the pubkey for this keypair:
+    // Todo - Don't regen public key every time?
     braveEC._genPubKey(pemPriv, function(err, pemPub){
       if(err){ return callback(err) };
       output.pub.pem = pemPub;
