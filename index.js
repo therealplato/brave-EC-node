@@ -174,7 +174,7 @@ module.exports = (function(){
   // Take PEM armored private EC key and generate PEM pubkey
   braveEC._genPubKey = function(input, callback){
     var openssl = require('child_process')
-    .spawn('openssl' ,['ec','-pubout', '-conv_form', 'compressed']);
+    .spawn('openssl' ,['ec','-pubout', '-conv_form', 'uncompressed']);
 
     openssl.stdin.write(input, 'utf8', function(err){ 
       if(err){return callback(err)};
@@ -284,11 +284,22 @@ module.exports = (function(){
     console.log(keyName);
     var payload = [date, uri, body].join('\n');
     var sig = "";
+    // Use openssl's binary output:
+    /*
     var openssl = require('child_process').spawn('openssl'
-    ,['dgst', '-sign', keyName, '-sha256']);
-    openssl.stdout.setEncoding('hex');
-    openssl.stdout.on('data', function(data){ sig += data });
-    openssl.on('close', function(){ callback(null, sig) });
+    ,['dgst', '-binary', '-sign', keyName, '-sha256']);
+    openssl.stdout.setEncoding('hex'); // have node output the binary as hex
+    */
+    var openssl = require('child_process').spawn('openssl'
+    ,['dgst', '-hex', '-sign', keyName, '-sha256']);
+    openssl.stdout.setEncoding('utf8'); // have node output the binary as hex
+    openssl.stdout.on('data', function(data){  sig += data  });
+    openssl.on('close', function(){ 
+      sig = sig.replace(/[\r\n]/g, ''); // remove newlines
+      // remove openssl 1.0.1c's junk "(stdin)= ":
+      sig = sig.replace(/^[^ ]* /, ''); 
+      callback(null, sig);
+    });
     openssl.on('error', function(err){ callback(err) });
     openssl.stdin.write(payload);
     openssl.stdin.end();
